@@ -1,0 +1,73 @@
+@startuml brand-commerce-erd
+entity User {
+    * id: VARCHAR
+    --
+    * firstname : VARCHAR
+    * lastname : VARCHAR
+    * email : VARCHAR
+    * password : VARCHAR
+    * gender : ENUM
+    * birthday : TIME
+    --
+    payment_id : []VARCHAR
+}
+
+entity Product {
+     * id: VARCHAR
+    --
+    * name: VARCHAR
+    * description: TEXT
+    * category: ENUM
+    * picture: []VARCHAR
+    NON RELATIONAL
+    --
+    cart_id : []VARCHAR
+    payment_id : []VARCHAR
+}
+
+entity Cart {
+    * id: VARCHAR
+    --
+    * quantity : INT
+    * total : INT
+    --
+    * product_id : []VARCHAR
+}
+
+entity Payment {
+    * id: VARCHAR
+    --
+    * price : INT
+    * order date : TIME
+    * shipping_cost : INT
+    * total : INT
+    --
+    * user_id : VARCHAR
+    * product_id : []VARCHAR
+}
+
+entity Order {
+    * id: VARCHAR
+    --
+    * product_id: VARCHAR
+    * cart_id: VARCHAR
+    * payment_id: VARCHAR
+}
+
+entity Review {
+    * id: VARCHAR
+    --
+    * review: TEXT
+    * star: INT
+}
+
+User ||--o{ Payment : User pays the bill
+Cart }o--|{ Product : Product in cart
+Payment }o--|{ Product : Payment contain product
+User }o--o{ Product : Favourite
+Product ||--o{ Review : Product reviews
+Order ||--|| Payment : Orcestration by order service
+Order }o--|{ Product : Orcestration by order service
+Order |o--|| Cart : Orcestration by order service
+
+@enduml
