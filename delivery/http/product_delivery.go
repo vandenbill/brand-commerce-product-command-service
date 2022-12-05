@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -44,7 +43,7 @@ func (p *productHttpDeliver) CreateProductHandler(c echo.Context) error {
 		false,    // immediate
 		amqp091.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(fmt.Sprintf("%v", data)),
+			Body:        []byte(data),
 		})
 	util.FailOnError(err, "Failed to publish a message")
 	log.Println("Send data")
@@ -71,7 +70,7 @@ func (p *productHttpDeliver) UpdateProductHandler(c echo.Context) error {
 		false,    // immediate
 		amqp091.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(fmt.Sprintf("%v", data)),
+			Body:        []byte(data),
 		})
 	util.FailOnError(err, "Failed to publish a message")
 	log.Println("Send data")

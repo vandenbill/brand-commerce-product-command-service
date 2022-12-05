@@ -17,7 +17,6 @@ import (
 )
 
 // TODO implement echo logging
-// TODO implement jaeger
 // TODO implement go doc
 // TODO implement swagger
 

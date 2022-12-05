@@ -16,9 +16,9 @@ type ProductRepoMongo interface {
 }
 
 type ProductUsecase interface {
-	CreateProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, map[string]interface{}, error)
-	UpdateProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, interface{}, error)
-	DeleteProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, string, error)
+	CreateProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, []byte, error)
+	UpdateProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, []byte, error)
+	DeleteProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, []byte, error)
 }
 
 type ProductHttpDeliver interface {

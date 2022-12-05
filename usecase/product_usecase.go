@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
 	"strings"
@@ -20,7 +21,7 @@ func NewProductUsecase(productRepoMongo domain.ProductRepoMongo) domain.ProductU
 	return &productUsecase{productRepoMongo: productRepoMongo}
 }
 
-func (p *productUsecase) CreateProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, map[string]interface{}, error) {
+func (p *productUsecase) CreateProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, []byte, error) {
 	trace, ctx := opentracing.StartSpanFromContext(jaegerCtx, "CreateProductUsecase")
 	defer trace.Finish()
 
@@ -36,11 +37,15 @@ func (p *productUsecase) CreateProductUsecase(c echo.Context, jaegerCtx context.
 
 	data["id"] = id.(primitive.ObjectID).Hex()
 	data["method"] = "create"
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	return id, data, nil
+	return id, jsonData, nil
 }
 
-func (p *productUsecase) UpdateProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, interface{}, error) {
+func (p *productUsecase) UpdateProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, []byte, error) {
 	trace, ctx := opentracing.StartSpanFromContext(jaegerCtx, "UpdateProductUsecase")
 	defer trace.Finish()
 
@@ -53,7 +58,7 @@ func (p *productUsecase) UpdateProductUsecase(c echo.Context, jaegerCtx context.
 
 	idPrimitive, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		log.Fatal("primitive.ObjectIDFromHex ERROR:", err)
+		return nil, nil, err
 	}
 
 	result, err := p.productRepoMongo.EditProduct(idPrimitive, data, ctx)
@@ -66,11 +71,15 @@ func (p *productUsecase) UpdateProductUsecase(c echo.Context, jaegerCtx context.
 
 	data["id"] = id
 	data["method"] = "update"
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	return result, data, err
+	return result, jsonData, err
 }
 
-func (p *productUsecase) DeleteProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, string, error) {
+func (p *productUsecase) DeleteProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, []byte, error) {
 	trace, ctx := opentracing.StartSpanFromContext(jaegerCtx, "DeleteProductUsecase")
 	defer trace.Finish()
 
@@ -84,11 +93,20 @@ func (p *productUsecase) DeleteProductUsecase(c echo.Context, jaegerCtx context.
 
 	result, err := p.productRepoMongo.RemoveProduct(idPrimitive, ctx)
 	if err != nil {
-		return nil, "", err
+		return nil, nil, err
 	}
 	if result.DeletedCount == 0 {
-		return nil, "", errors.New("cannot delete data")
+		return nil, nil, errors.New("cannot delete data, id not match")
 	}
 
-	return result, id, nil
+	data := map[string]interface{}{
+		"id":     id,
+		"method": "delete",
+	}
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return result, jsonData, nil
 }
