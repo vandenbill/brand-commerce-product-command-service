@@ -2,11 +2,12 @@ package mongo
 
 import (
 	"context"
+	"log"
+
 	"github.com/vandenbill/brand-commerce/product-command-service/model/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 )
 
 type productRepo struct {
@@ -17,8 +18,18 @@ func NewProductRepo(dbClient *mongo.Client) domain.ProductRepoMongo {
 	return &productRepo{dbClient: dbClient}
 }
 
+func (p *productRepo) FindProduct(idPrimitive primitive.ObjectID) (*mongo.SingleResult, error) {
+	log.Printf("FindProduct repo invoked")
+
+	coll := p.dbClient.Database("product-service").Collection("product")
+	filter := bson.D{{"_id", idPrimitive}}
+
+	result := coll.FindOne(context.Background(), filter)
+
+	return result, nil
+}
+
 func (p *productRepo) SaveProduct(data interface{}) (interface{}, error) {
-	// TODO setup log
 	log.Printf("SaveProduct repo invoked")
 
 	coll := p.dbClient.Database("product-service").Collection("product")
@@ -31,13 +42,8 @@ func (p *productRepo) SaveProduct(data interface{}) (interface{}, error) {
 	return result.InsertedID, nil
 }
 
-func (p *productRepo) EditProduct(id string, data interface{}) (*mongo.UpdateResult, error) {
+func (p *productRepo) EditProduct(idPrimitive primitive.ObjectID, data interface{}) (*mongo.UpdateResult, error) {
 	log.Printf("EditProduct repo invoked")
-
-	idPrimitive, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		log.Fatal("primitive.ObjectIDFromHex ERROR:", err)
-	}
 
 	coll := p.dbClient.Database("product-service").Collection("product")
 	filter := bson.D{{"_id", idPrimitive}}
@@ -50,13 +56,8 @@ func (p *productRepo) EditProduct(id string, data interface{}) (*mongo.UpdateRes
 	return result, nil
 }
 
-func (p *productRepo) RemoveProduct(id string) (*mongo.DeleteResult, error) {
+func (p *productRepo) RemoveProduct(idPrimitive primitive.ObjectID) (*mongo.DeleteResult, error) {
 	log.Printf("RemoveProduct repo invoked")
-
-	idPrimitive, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		log.Fatal("primitive.ObjectIDFromHex ERROR:", err)
-	}
 
 	coll := p.dbClient.Database("product-service").Collection("product")
 	filter := bson.D{{"_id", idPrimitive}}

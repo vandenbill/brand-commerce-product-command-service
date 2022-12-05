@@ -3,7 +3,6 @@ package mongo
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
@@ -12,7 +11,8 @@ import (
 )
 
 func NewClient() (*mongo.Client, context.Context) {
-	uri := os.Getenv("DB_URI")
+	const uri = "mongodb://root:root@localhost:27017/?maxPoolSize=20&w=majority"
+	// uri := os.Getenv("DB_URI")
 
 	ctx := context.Background()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
