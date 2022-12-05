@@ -14,7 +14,7 @@ services:
   mongo:
     image: mongo
     restart: always
-    container_name: mongo-dev
+    container_name: mongo-product-service
     ports:
       - 27017:27017
     environment:
@@ -30,7 +30,7 @@ services:
 
   mongo-express:
     image: mongo-express
-    container_name: mongo-express-dev
+    container_name: mongo-express-product-service
     restart: always
     ports:
       - 8081:8081

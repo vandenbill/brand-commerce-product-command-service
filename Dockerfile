@@ -5,6 +5,6 @@ COPY go.mod /app
 COPY go.sum /app
 RUN go mod download
 COPY . .
-RUN go build -o /app main.go
+RUN go build -o /app app/main.go
 EXPOSE 1323
 CMD /app/main

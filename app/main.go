@@ -8,8 +8,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/rabbitmq/amqp091-go"
 
-	// "github.com/uber/jaeger-client-go"
-	// jaegercfg "github.com/uber/jaeger-client-go/config"
+	"github.com/uber/jaeger-client-go"
+	jaegercfg "github.com/uber/jaeger-client-go/config"
 	"github.com/vandenbill/brand-commerce/product-command-service/delivery/http"
 	"github.com/vandenbill/brand-commerce/product-command-service/repository/mongo"
 	"github.com/vandenbill/brand-commerce/product-command-service/usecase"
@@ -24,24 +24,24 @@ import (
 func main() {
 	e := echo.New()
 
-	// cfg := jaegercfg.Configuration{
-	// 	Sampler: &jaegercfg.SamplerConfig{
-	// 		Type:  jaeger.SamplerTypeConst,
-	// 		Param: 10,
-	// 	},
-	// 	Reporter: &jaegercfg.ReporterConfig{
-	// 		LogSpans:           true,
-	// 		LocalAgentHostPort: "127.0.0.1:6831", // replace host
-	// 	},
-	// }
-	// closer, err := cfg.InitGlobalTracer(
-	// 	"product-command-service",
-	// )
-	// defer closer.Close()
-	// if err != nil {
-	// 	log.Printf("Could not initialize jaeger tracer: %s", err.Error())
-	// 	return
-	// }
+	cfg := jaegercfg.Configuration{
+		Sampler: &jaegercfg.SamplerConfig{
+			Type:  jaeger.SamplerTypeConst,
+			Param: 10,
+		},
+		Reporter: &jaegercfg.ReporterConfig{
+			LogSpans:           true,
+			LocalAgentHostPort: "127.0.0.1:6831", // replace host
+		},
+	}
+	closer, err := cfg.InitGlobalTracer(
+		"product-command-service",
+	)
+	if err != nil {
+		log.Printf("Could not initialize jaeger tracer: %s", err.Error())
+		return
+	}
+	defer closer.Close()
 
 	conn, err := amqp091.Dial("amqp://root:root@localhost:5672/")
 	util.FailOnError(err, "Failed to connect to RabbitMQ")

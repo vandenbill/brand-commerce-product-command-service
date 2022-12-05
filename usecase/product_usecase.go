@@ -1,11 +1,13 @@
 package usecase
 
 import (
+	"context"
 	"errors"
 	"log"
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/opentracing/opentracing-go"
 	"github.com/vandenbill/brand-commerce/product-command-service/model/domain"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -18,15 +20,16 @@ func NewProductUsecase(productRepoMongo domain.ProductRepoMongo) domain.ProductU
 	return &productUsecase{productRepoMongo: productRepoMongo}
 }
 
-func (p *productUsecase) CreateProductUsecase(c echo.Context) (interface{}, map[string]interface{}, error) {
-	log.Printf("CreateProduct service invoked")
+func (p *productUsecase) CreateProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, map[string]interface{}, error) {
+	trace, ctx := opentracing.StartSpanFromContext(jaegerCtx, "CreateProductUsecase")
+	defer trace.Finish()
 
 	data := map[string]interface{}{}
 	if err := c.Bind(&data); err != nil {
 		return nil, nil, err
 	}
 
-	id, err := p.productRepoMongo.SaveProduct(data)
+	id, err := p.productRepoMongo.SaveProduct(data, ctx)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -37,8 +40,9 @@ func (p *productUsecase) CreateProductUsecase(c echo.Context) (interface{}, map[
 	return id, data, nil
 }
 
-func (p *productUsecase) UpdateProductUsecase(c echo.Context) (interface{}, interface{}, error) {
-	log.Printf("UpdateProduct service invoked")
+func (p *productUsecase) UpdateProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, interface{}, error) {
+	trace, ctx := opentracing.StartSpanFromContext(jaegerCtx, "UpdateProductUsecase")
+	defer trace.Finish()
 
 	param := c.Param("id")
 	id := strings.Replace(param, "/", "", -1)
@@ -52,7 +56,7 @@ func (p *productUsecase) UpdateProductUsecase(c echo.Context) (interface{}, inte
 		log.Fatal("primitive.ObjectIDFromHex ERROR:", err)
 	}
 
-	result, err := p.productRepoMongo.EditProduct(idPrimitive, data)
+	result, err := p.productRepoMongo.EditProduct(idPrimitive, data, ctx)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -66,8 +70,9 @@ func (p *productUsecase) UpdateProductUsecase(c echo.Context) (interface{}, inte
 	return result, data, err
 }
 
-func (p *productUsecase) DeleteProductUsecase(c echo.Context) (interface{}, string, error) {
-	log.Printf("DeleteProduct service invoked")
+func (p *productUsecase) DeleteProductUsecase(c echo.Context, jaegerCtx context.Context) (interface{}, string, error) {
+	trace, ctx := opentracing.StartSpanFromContext(jaegerCtx, "DeleteProductUsecase")
+	defer trace.Finish()
 
 	param := c.Param("id")
 	id := strings.Replace(param, "/", "", -1)
@@ -77,7 +82,7 @@ func (p *productUsecase) DeleteProductUsecase(c echo.Context) (interface{}, stri
 		log.Fatal("primitive.ObjectIDFromHex ERROR:", err)
 	}
 
-	result, err := p.productRepoMongo.RemoveProduct(idPrimitive)
+	result, err := p.productRepoMongo.RemoveProduct(idPrimitive, ctx)
 	if err != nil {
 		return nil, "", err
 	}

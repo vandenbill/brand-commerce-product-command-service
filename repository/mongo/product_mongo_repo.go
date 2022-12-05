@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/opentracing/opentracing-go"
 	"github.com/vandenbill/brand-commerce/product-command-service/model/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,8 +19,9 @@ func NewProductRepo(dbClient *mongo.Client) domain.ProductRepoMongo {
 	return &productRepo{dbClient: dbClient}
 }
 
-func (p *productRepo) FindProduct(idPrimitive primitive.ObjectID) (*mongo.SingleResult, error) {
-	log.Printf("FindProduct repo invoked")
+func (p *productRepo) FindProduct(idPrimitive primitive.ObjectID, jaegerCtx context.Context) (*mongo.SingleResult, error) {
+	trace, _ := opentracing.StartSpanFromContext(jaegerCtx, "FindProduct")
+	defer trace.Finish()
 
 	coll := p.dbClient.Database("product-service").Collection("product")
 	filter := bson.D{{"_id", idPrimitive}}
@@ -29,8 +31,9 @@ func (p *productRepo) FindProduct(idPrimitive primitive.ObjectID) (*mongo.Single
 	return result, nil
 }
 
-func (p *productRepo) SaveProduct(data interface{}) (interface{}, error) {
-	log.Printf("SaveProduct repo invoked")
+func (p *productRepo) SaveProduct(data interface{}, jaegerCtx context.Context) (interface{}, error) {
+	trace, _ := opentracing.StartSpanFromContext(jaegerCtx, "SaveProduct")
+	defer trace.Finish()
 
 	coll := p.dbClient.Database("product-service").Collection("product")
 	result, err := coll.InsertOne(context.Background(), data)
@@ -42,8 +45,9 @@ func (p *productRepo) SaveProduct(data interface{}) (interface{}, error) {
 	return result.InsertedID, nil
 }
 
-func (p *productRepo) EditProduct(idPrimitive primitive.ObjectID, data interface{}) (*mongo.UpdateResult, error) {
-	log.Printf("EditProduct repo invoked")
+func (p *productRepo) EditProduct(idPrimitive primitive.ObjectID, data interface{}, jaegerCtx context.Context) (*mongo.UpdateResult, error) {
+	trace, _ := opentracing.StartSpanFromContext(jaegerCtx, "EditProduct")
+	defer trace.Finish()
 
 	coll := p.dbClient.Database("product-service").Collection("product")
 	filter := bson.D{{"_id", idPrimitive}}
@@ -56,8 +60,9 @@ func (p *productRepo) EditProduct(idPrimitive primitive.ObjectID, data interface
 	return result, nil
 }
 
-func (p *productRepo) RemoveProduct(idPrimitive primitive.ObjectID) (*mongo.DeleteResult, error) {
-	log.Printf("RemoveProduct repo invoked")
+func (p *productRepo) RemoveProduct(idPrimitive primitive.ObjectID, jaegerCtx context.Context) (*mongo.DeleteResult, error) {
+	trace, _ := opentracing.StartSpanFromContext(jaegerCtx, "RemoveProduct")
+	defer trace.Finish()
 
 	coll := p.dbClient.Database("product-service").Collection("product")
 	filter := bson.D{{"_id", idPrimitive}}

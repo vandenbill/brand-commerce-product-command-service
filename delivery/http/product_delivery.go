@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/opentracing/opentracing-go"
 	"github.com/rabbitmq/amqp091-go"
 	"github.com/vandenbill/brand-commerce/product-command-service/model/domain"
 	"github.com/vandenbill/brand-commerce/product-command-service/model/web"
@@ -25,7 +26,10 @@ func NewProductHttpDeliver(productUsecase domain.ProductUsecase, ctx context.Con
 }
 
 func (p *productHttpDeliver) CreateProductHandler(c echo.Context) error {
-	id, data, err := p.productUsecase.CreateProductUsecase(c)
+	trace, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "CreateProductHandler")
+	defer trace.Finish()
+
+	id, data, err := p.productUsecase.CreateProductUsecase(c, ctx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, web.BuildErrorResponse("Error could not save data", err.Error()))
 		return nil
@@ -49,7 +53,10 @@ func (p *productHttpDeliver) CreateProductHandler(c echo.Context) error {
 }
 
 func (p *productHttpDeliver) UpdateProductHandler(c echo.Context) error {
-	result, data, err := p.productUsecase.UpdateProductUsecase(c)
+	trace, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "UpdateProductHandler")
+	defer trace.Finish()
+
+	result, data, err := p.productUsecase.UpdateProductUsecase(c, ctx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, web.BuildErrorResponse("Error could not update data.", err.Error()))
 		return nil
@@ -73,7 +80,10 @@ func (p *productHttpDeliver) UpdateProductHandler(c echo.Context) error {
 }
 
 func (p *productHttpDeliver) DeleteProductHandler(c echo.Context) error {
-	result, id, err := p.productUsecase.DeleteProductUsecase(c)
+	trace, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "UpdateProductHandler")
+	defer trace.Finish()
+
+	result, id, err := p.productUsecase.DeleteProductUsecase(c, ctx)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, web.BuildErrorResponse("Error could not remove data.", err.Error()))
 		return nil
