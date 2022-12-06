@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/rabbitmq/amqp091-go"
+	amqp "github.com/rabbitmq/amqp091-go"
 
 	"github.com/uber/jaeger-client-go"
 	jaegercfg "github.com/uber/jaeger-client-go/config"
@@ -23,6 +24,7 @@ import (
 func main() {
 	e := echo.New()
 
+	jaegerHOSTPORT := os.Getenv("JAEGER_HOST_PORT")
 	cfg := jaegercfg.Configuration{
 		Sampler: &jaegercfg.SamplerConfig{
 			Type:  jaeger.SamplerTypeConst,
@@ -30,7 +32,7 @@ func main() {
 		},
 		Reporter: &jaegercfg.ReporterConfig{
 			LogSpans:           true,
-			LocalAgentHostPort: "127.0.0.1:6831", // replace host
+			LocalAgentHostPort: jaegerHOSTPORT,
 		},
 	}
 	closer, err := cfg.InitGlobalTracer(
@@ -42,7 +44,8 @@ func main() {
 	}
 	defer closer.Close()
 
-	conn, err := amqp091.Dial("amqp://root:root@localhost:5672/")
+	rabbitmqURI := os.Getenv("RABBITMQ_URI")
+	conn, err := amqp.Dial(rabbitmqURI)
 	util.FailOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -51,15 +54,14 @@ func main() {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		"product-service-queue", // name
-		false,                   // durable
-		false,                   // delete when unused
-		false,                   // exclusive
-		false,                   // no-wait
-		nil,                     // arguments
+		"product-queue", // name
+		false,           // durable
+		false,           // delete when unused
+		false,           // exclusive
+		false,           // no-wait
+		nil,             // arguments
 	)
 	util.FailOnError(err, "Failed to declare a queue")
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

@@ -1,15 +1,27 @@
 version: '3.8'
 
 services:
-  product-service:
+  product-command-service:
     build:
       context: "./"
       dockerfile: Dockerfile
     image: vandenbill/product-service
+    container_name: product-command-service
     ports:
       - 8080:8080
     environment:
       DB_URI: mongodb://root:root@host.docker.internal:27017/
+      RABBITMQ_URI: amqp://root:root@host.docker.internal:5672/
+      JAEGER_HOST_PORT: 0.0.0.0:6831
+
+  product-query-service:
+    image: vandenbill/product-query-service
+    container_name: product-query-service
+    ports:
+      - 3000:3000
+    environment:
+      RABBITMQ_URI: amqp://root:root@host.docker.internal:5672/
+      JAEGER_HOST_PORT: 0.0.0.0:6831
 
   mongo:
     image: mongo
@@ -40,6 +52,42 @@ services:
       ME_CONFIG_MONGODB_URL: mongodb://root:root@mongo-dev:27017/
     networks:
       - product-service-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger-product-service
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+    networks:
+      - product-service-network
+
+  rabbitmq:
+    image: rabbitmq:3.11.4-management
+    container_name: rabbitmq-product-service
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - type: volume
+        read_only: false
+        source: product-service-volume
+        target: "/var/lib/rabbitmq"
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: root
+
+  elasticsearch:
+    image: elasticsearch:7.17.7
+    container_name: elasticsearch-product-service
+    environment:
+      - cluster.name=docker-cluster
+      - discovery.type=single-node
+    volumes:
+      - product-service-volume:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
 
 networks:
   product-service-network:
