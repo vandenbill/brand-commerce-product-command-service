@@ -10,17 +10,20 @@ services:
     ports:
       - 8080:8080
     environment:
-      DB_URI: mongodb://root:root@host.docker.internal:27017/
-      RABBITMQ_URI: amqp://root:root@host.docker.internal:5672/
+      MONGO_URI: mongodb://root:root@host.docker.internal:27017/
+      RABBITMQ_URI: amqp://root:root@rabbitmq-product-service:5672/
       JAEGER_HOST_PORT: 0.0.0.0:6831
 
   product-query-service:
+    build:
+      context: "../product-query-service"
+      dockerfile: Dockerfile
     image: vandenbill/product-query-service
     container_name: product-query-service
     ports:
       - 3000:3000
     environment:
-      RABBITMQ_URI: amqp://root:root@host.docker.internal:5672/
+      RABBITMQ_URI: amqp://root:root@0.0.0.0:5672/
       JAEGER_HOST_PORT: 0.0.0.0:6831
 
   mongo:
@@ -76,18 +79,6 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: root
       RABBITMQ_DEFAULT_PASS: root
-
-  elasticsearch:
-    image: elasticsearch:7.17.7
-    container_name: elasticsearch-product-service
-    environment:
-      - cluster.name=docker-cluster
-      - discovery.type=single-node
-    volumes:
-      - product-service-volume:/usr/share/elasticsearch/data
-    ports:
-      - 9200:9200
-      - 9300:9300
 
 networks:
   product-service-network:

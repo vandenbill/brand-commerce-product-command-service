@@ -6,5 +6,5 @@ COPY go.sum /app
 RUN go mod download
 COPY . .
 RUN go build -o /app app/main.go
-EXPOSE 1323
+EXPOSE 8080
 CMD /app/main
