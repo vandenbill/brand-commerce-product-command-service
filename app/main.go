@@ -20,6 +20,7 @@ import (
 // TODO implement echo logging
 // TODO implement go doc
 // TODO implement swagger
+// TODO modularize ur code
 
 func main() {
 	e := echo.New()
