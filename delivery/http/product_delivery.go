@@ -8,9 +8,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/opentracing/opentracing-go"
 	"github.com/rabbitmq/amqp091-go"
-	"github.com/vandenbill/brand-commerce/product-command-service/model/domain"
-	"github.com/vandenbill/brand-commerce/product-command-service/model/web"
-	"github.com/vandenbill/brand-commerce/product-command-service/util"
+	"github.com/vandenbill/brand-commerce-product-command-service/model/domain"
+	"github.com/vandenbill/brand-commerce-product-command-service/model/web"
+	"github.com/vandenbill/brand-commerce-product-command-service/util"
 )
 
 type productHttpDeliver struct {

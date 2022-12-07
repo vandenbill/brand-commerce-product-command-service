@@ -9,7 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/opentracing/opentracing-go"
-	"github.com/vandenbill/brand-commerce/product-command-service/model/domain"
+	"github.com/vandenbill/brand-commerce-product-command-service/model/domain"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 

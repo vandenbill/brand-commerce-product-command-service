@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/opentracing/opentracing-go"
-	"github.com/vandenbill/brand-commerce/product-command-service/model/domain"
+	"github.com/vandenbill/brand-commerce-product-command-service/model/domain"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

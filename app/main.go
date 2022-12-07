@@ -11,10 +11,10 @@ import (
 
 	"github.com/uber/jaeger-client-go"
 	jaegercfg "github.com/uber/jaeger-client-go/config"
-	"github.com/vandenbill/brand-commerce/product-command-service/delivery/http"
-	"github.com/vandenbill/brand-commerce/product-command-service/repository/mongo"
-	"github.com/vandenbill/brand-commerce/product-command-service/usecase"
-	"github.com/vandenbill/brand-commerce/product-command-service/util"
+	"github.com/vandenbill/brand-commerce-product-command-service/delivery/http"
+	"github.com/vandenbill/brand-commerce-product-command-service/repository/mongo"
+	"github.com/vandenbill/brand-commerce-product-command-service/usecase"
+	"github.com/vandenbill/brand-commerce-product-command-service/util"
 )
 
 // TODO implement echo logging

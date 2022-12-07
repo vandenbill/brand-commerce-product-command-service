@@ -1,4 +1,4 @@
-module github.com/vandenbill/brand-commerce/product-command-service
+module github.com/vandenbill/brand-commerce-product-command-service
 
 go 1.19
 
