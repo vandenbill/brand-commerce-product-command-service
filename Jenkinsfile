@@ -33,6 +33,7 @@ pipeline {
                         sh 'docker login -u vandenbill -p ${dockerhubpw}'
                     }
                     sh 'docker image push vandenbill/brand-commerce-product-command-service'
+                    sh 'docker image push vandenbill/brand-commerce-product-query-service'
                 }
             }
         }
