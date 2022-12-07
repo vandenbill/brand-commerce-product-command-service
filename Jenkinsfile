@@ -19,7 +19,7 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/vandenbill/brand-commerce-product-query-service']]])
             }
         }
-        stage ('build source code product command service') {
+        stage ('build source code product query service') {
             steps {
                 script {
                     sh 'docker build -t vandenbill/brand-commerce-product-command-service .'
